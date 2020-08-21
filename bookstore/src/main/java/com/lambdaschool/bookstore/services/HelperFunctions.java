@@ -1,6 +1,7 @@
 package com.lambdaschool.bookstore.services;
 
 import com.lambdaschool.bookstore.models.ValidationError;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
