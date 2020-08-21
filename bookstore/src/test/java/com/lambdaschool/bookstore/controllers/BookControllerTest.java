@@ -51,6 +51,7 @@ public class BookControllerTest
     public void setUp() throws
             Exception
     {
+        bookList = new ArrayList<>();
         /*****
          * The following is needed due to security being in place!
          */

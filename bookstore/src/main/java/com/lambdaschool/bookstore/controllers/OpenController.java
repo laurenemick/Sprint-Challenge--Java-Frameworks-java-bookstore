@@ -58,15 +58,15 @@ public class OpenController
      * @throws URISyntaxException we create some URIs during this method. If anything goes wrong with that creation, an exception is thrown.
      */
     @PostMapping(value = "/createnewuser",
-            consumes = {"application/json"},
-            produces = {"application/json"})
+        consumes = {"application/json"},
+        produces = {"application/json"})
     public ResponseEntity<?> addSelf(
-            HttpServletRequest httpServletRequest,
-            @Valid
-            @RequestBody
-                    UserMinimum newminuser)
-            throws
-            URISyntaxException
+        HttpServletRequest httpServletRequest,
+        @Valid
+        @RequestBody
+            UserMinimum newminuser)
+        throws
+        URISyntaxException
     {
         // Create the user
         User newuser = new User();
@@ -78,7 +78,7 @@ public class OpenController
         // add the default role of user
         Set<UserRoles> newRoles = new HashSet<>();
         newRoles.add(new UserRoles(newuser,
-                                   roleService.findByName("user")));
+            roleService.findByName("user")));
         newuser.setRoles(newRoles);
 
         newuser = userService.save(newuser);
@@ -87,20 +87,24 @@ public class OpenController
         // The location comes from a different controller!
         HttpHeaders responseHeaders = new HttpHeaders();
         URI newUserURI = ServletUriComponentsBuilder.fromUriString(httpServletRequest.getServerName() + ":" + httpServletRequest.getLocalPort() + "/users/user/{userId}")
-                .buildAndExpand(newuser.getUserid())
-                .toUri();
+            .buildAndExpand(newuser.getUserid())
+            .toUri();
         responseHeaders.setLocation(newUserURI);
 
         // return the access token
         // To get the access token, surf to the endpoint /login just as if a client had done this.
         // You cannot use a port when on Heroku
-        String port = "";
-        if (httpServletRequest.getServerName()
-                .equalsIgnoreCase("localhost"))
-        {
-            port = ":" + httpServletRequest.getLocalPort();
-        }
-        String requestURI = "http://" + httpServletRequest.getServerName() + port + "/login";
+//        String port = "";
+//        if (httpServletRequest.getServerName()
+//            .equalsIgnoreCase("localhost"))
+//        {
+//            port = ":" + httpServletRequest.getLocalPort();
+//        }
+//        String requestURI = "http://" + httpServletRequest.getServerName() + port + "/login";
+        RestTemplate restTemplate = new RestTemplate();
+        String requestURI = "http://" + httpServletRequest.getServerName() +
+            (httpServletRequest.getServerName().equalsIgnoreCase("localhost") ? ":" + httpServletRequest.getLocalPort() : "") +
+            "/login";
 
         List<MediaType> acceptableMediaTypes = new ArrayList<>();
         acceptableMediaTypes.add(MediaType.APPLICATION_JSON);
@@ -109,28 +113,28 @@ public class OpenController
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(acceptableMediaTypes);
         headers.setBasicAuth(System.getenv("OAUTHCLIENTID"),
-                             System.getenv("OAUTHCLIENTSECRET"));
+            System.getenv("OAUTHCLIENTSECRET"));
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type",
-                "password");
+            "password");
         map.add("scope",
-                "read write trust");
+            "read write trust");
         map.add("username",
-                newminuser.getUsername());
+            newminuser.getUsername());
         map.add("password",
-                newminuser.getPassword());
+            newminuser.getPassword());
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map,
-                                                                             headers);
+            headers);
 
         String theToken = restTemplate.postForObject(requestURI,
-                                                     request,
-                                                     String.class);
+            request,
+            String.class);
 
         return new ResponseEntity<>(theToken,
-                                    responseHeaders,
-                                    HttpStatus.CREATED);
+            responseHeaders,
+            HttpStatus.CREATED);
     }
 
     /**
