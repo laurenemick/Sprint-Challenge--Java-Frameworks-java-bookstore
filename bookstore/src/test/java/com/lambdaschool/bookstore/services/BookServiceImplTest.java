@@ -2,6 +2,7 @@ package com.lambdaschool.bookstore.services;
 
 import com.lambdaschool.bookstore.BookstoreApplication;
 import com.lambdaschool.bookstore.exceptions.ResourceNotFoundException;
+import com.lambdaschool.bookstore.models.Book;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BookstoreApplication.class)
-//**********
-// Note security is handled at the controller, hence we do not need to worry about security here!
-//**********
 public class BookServiceImplTest
 {
 
@@ -25,15 +26,19 @@ public class BookServiceImplTest
     private BookService bookService;
 
     @Before
-    public void setUp() throws
-            Exception
+    public void setUp() throws Exception
     {
         MockitoAnnotations.initMocks(this);
+
+        List<Book> myList = bookService.findAll();
+        for (Book b : myList)
+        {
+            System.out.println(b.getBookid() + "" + b.getTitle());
+        }
     }
 
     @After
-    public void tearDown() throws
-            Exception
+    public void tearDown() throws Exception
     {
     }
 
@@ -46,6 +51,7 @@ public class BookServiceImplTest
     @Test
     public void findBookById()
     {
+        assertEquals("Flatterland", bookService.findBookById(1).getTitle());
     }
 
     @Test(expected = ResourceNotFoundException.class)

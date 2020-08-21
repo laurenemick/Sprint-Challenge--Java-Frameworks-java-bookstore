@@ -54,6 +54,9 @@ public class BookstoreApplication
             // so run the application!
             SpringApplication.run(BookstoreApplication.class,
                                   args);
+        } else
+        {
+            System.out.println("Missing envi variables");
         }
     }
 }
